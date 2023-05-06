@@ -11,11 +11,12 @@ Message Passing Neural Networks
 
 Detailed Implementation of each model can be found at *models.py*
 
+Experiment has been done with gps.ipynb and message_passing_models.ipynb
+
 ```
 sage = GraphSAGE(in_channels=dataset.num_features, hidden_channels=256, number_of_classes=dataset.num_classes, num_of_hidden_layers=4, device=device)
 gat = GAT(in_channels=dataset.num_features, hidden_channels=476, number_of_classes=dataset.num_classes, num_of_hidden_layers=4, device=device, heads=1)
 gin = GIN(in_channels=dataset.num_features, hidden_channels=415, number_of_classes=dataset.num_classes, num_of_hidden_layers=4, device=device)
-
 ```
 
 
