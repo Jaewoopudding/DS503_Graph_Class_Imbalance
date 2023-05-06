@@ -9,6 +9,9 @@ Message Passing Neural Networks
 
 - GIN (Keyulu Xu et. al. How Powerful are Graph Neural Networks?., CVPR2019)
 
+
+## User Guide
+
 Detailed Implementation of each model can be found at *models.py*
 
 Experiment has been done with gps.ipynb and message_passing_models.ipynb
