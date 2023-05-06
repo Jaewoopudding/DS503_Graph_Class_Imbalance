@@ -12,15 +12,14 @@ def train_model(model, data:torch_geometric.data.data.Data, optimizer, criterion
     pred = out.argmax(dim=-1)
     correct = pred[data.train_mask] == data.y[data.train_mask]
     acc = int(correct.sum()) / int(data.train_mask.sum())
-    return loss
-
+    return loss.detach().cpu().numpy(), acc
 
 def test_model(model, data:torch_geometric.data.data.Data):
     model.eval()
     out = model(data.x, data.edge_index)
     pred = out.argmax(dim=-1)
-    correct = (pred[~data.train_mask] == data.y[~data.train_mask])
-    acc = int(correct.sum()) / int(correct.shape[0])
-    f1 = f1_score(data.y[~data.train_mask], pred[~data.train_mask], average='micro')
-    print(classification_report(data.y[~data.train_mask], pred[~data.train_mask]))
-    return acc, f1
+    report = classification_report(data.y[~data.train_mask.cpu()].cpu(), pred[~data.train_mask.cpu()].cpu(), output_dict=True)
+    return report
+
+def save_result(report):
+    pass
