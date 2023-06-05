@@ -48,7 +48,7 @@ def valid_model(model, data:torch_geometric.data.data.Data, criterion, constrati
         loss = loss + constrative_loss
     pred = out.argmax(dim=-1)
     correct = pred[data.valid_mask] == data.y[data.valid_mask]
-    acc = int(correct.sum()) / int(data.train_mask.sum())
+    acc = int(correct.sum()) / int(data.valid_mask.sum())
     return loss.detach().cpu().numpy(), acc
 
 def save_result(report):
