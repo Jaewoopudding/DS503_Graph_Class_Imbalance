@@ -29,15 +29,16 @@ class VirtualClassNode(torch_geometric.transforms.BaseTransform):
             num_nodes += 1
 
         for key, _ in data.items():
+            y_len = data.y.unique().shape[0]
             if key == 'x':
-                temp_x = torch.zeros((70, 8710)).to(data.x.device)
+                temp_x = torch.zeros((y_len, data.x.shape[1])).to(data.x.device)
                 data.x = torch.cat([data.x,temp_x], dim=0)
             elif key == 'y':
-                temp_y = torch.arange(70).long().to(data.x.device)
+                temp_y = torch.arange(y_len).long().to(data.x.device)
                 print(data.y)
                 data.y = torch.cat([data.y, temp_y], dim=0)
             elif key == 'train_mask':
-                temp_mask = torch.ones((70)).to(torch.bool).to(data.x.device)
+                temp_mask = torch.ones((y_len)).to(torch.bool).to(data.x.device)
                 data.train_mask = torch.cat([data.train_mask, temp_mask])
                     
         data.edge_index = edge_index
@@ -74,15 +75,16 @@ class UnidirectionalVirtualClassNode(torch_geometric.transforms.BaseTransform):
             num_nodes += 1
 
         for key, _ in data.items():
+            y_len = data.y.unique().shape[0]
             if key == 'x':
-                temp_x = torch.zeros((70, 8710)).to(data.x.device)
+                temp_x = torch.zeros((y_len, data.x.shape[1])).to(data.x.device)
                 data.x = torch.cat([data.x,temp_x], dim=0)
             elif key == 'y':
-                temp_y = torch.arange(70).long().to(data.x.device)
+                temp_y = torch.arange(y_len).long().to(data.x.device)
                 print(data.y)
                 data.y = torch.cat([data.y, temp_y], dim=0)
             elif key == 'train_mask':
-                temp_mask = torch.ones((70)).to(torch.bool).to(data.x.device)
+                temp_mask = torch.ones((y_len)).to(torch.bool).to(data.x.device)
                 data.train_mask = torch.cat([data.train_mask, temp_mask])
                     
         data.edge_index = edge_index
