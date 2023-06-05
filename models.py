@@ -44,9 +44,11 @@ class GAT(GNN):
         self.heads = heads
         self.model = self.build_model().to(device)
         self.num_of_parameters = self.get_n_params()
+        self.classifier_net = nn.Linear(in_features=hidden_channels, out_features=number_of_classes)
 
     def forward(self, x, edge_index):
-        return self.model(x, edge_index)
+        embedding = self.model(x, edge_index)
+        return self.classifier_net(embedding), embedding
     
     def build_model(self):
         layers=[]
@@ -56,7 +58,6 @@ class GAT(GNN):
                                   out_channels=self.hidden_channels,
                                   heads=self.heads),'x, edge_index -> x'))
             layers.append(nn.ELU(inplace=True))
-        layers.append(nn.Linear(in_features=self.hidden_channels, out_features=self.number_of_classes))
         return gnn.Sequential('x, edge_index', layers)
     
 
@@ -73,9 +74,11 @@ class GraphSAGE(GNN):
         self.heads = heads
         self.model = self.build_model()
         self.num_of_parameters = self.get_n_params()
+        self.classifier_net = nn.Linear(in_features=self.hidden_channels, out_features=self.number_of_classes)
 
     def forward(self, x, edge_index):
-        return self.model(x, edge_index)
+        embedding = self.model(x, edge_index)
+        return self.classifier_net(embedding), embedding
     
     def build_model(self):
         layers=[]
@@ -84,7 +87,6 @@ class GraphSAGE(GNN):
             layers.append((gnn.SAGEConv(in_channels=self.in_channels if i==0 else self.hidden_channels,
                                   out_channels=self.hidden_channels),'x, edge_index -> x'))
             layers.append(nn.ELU(inplace=True))
-        layers.append(nn.Linear(in_features=self.hidden_channels, out_features=self.number_of_classes))
         return gnn.Sequential('x, edge_index', layers)
     
 
@@ -101,9 +103,11 @@ class GIN(GNN):
         self.heads = heads
         self.model = self.build_model()
         self.num_of_parameters = self.get_n_params()
+        self.classifier_net = nn.Linear(in_features=self.hidden_channels, out_features=self.number_of_classes)
 
     def forward(self, x, edge_index):
-        return self.model(x, edge_index)
+        embedding = self.model(x, edge_index)
+        return self.classifier_net(embedding), embedding
     
     def build_model(self):
         layers=[]
@@ -118,5 +122,4 @@ class GIN(GNN):
                                        nn.ELU(),
                                        nn.BatchNorm1d(self.hidden_channels))),
                                        'x, edge_index -> x'))
-        layers.append(nn.Linear(in_features=self.hidden_channels, out_features=self.number_of_classes))
         return gnn.Sequential('x, edge_index', layers)
