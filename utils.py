@@ -5,7 +5,7 @@ import torch_geometric
 def train_model(model, data:torch_geometric.data.data.Data, optimizer, criterion):
     model.train()
     optimizer.zero_grad()
-    out = model(data.x, data.edge_index)
+    out, embedding = model(data.x, data.edge_index)
     loss = criterion(out[data.train_mask], data.y[data.train_mask])
     loss.backward()
     optimizer.step()
@@ -16,7 +16,7 @@ def train_model(model, data:torch_geometric.data.data.Data, optimizer, criterion
 
 def test_model(model, data:torch_geometric.data.data.Data):
     model.eval()
-    out = model(data.x, data.edge_index)
+    out, embedding = model(data.x, data.edge_index)
     pred = out.argmax(dim=-1)
     report = classification_report(data.y[~data.train_mask.cpu()].cpu(), pred[~data.train_mask.cpu()].cpu(), output_dict=True)
     return report
