@@ -36,11 +36,16 @@ class VirtualClassNode(torch_geometric.transforms.BaseTransform):
                 data.x = torch.cat([data.x,temp_x], dim=0)
             elif key == 'y':
                 temp_y = torch.arange(70).long().to(data.x.device)
-                print(data.y)
                 data.y = torch.cat([data.y, temp_y], dim=0)
             elif key == 'train_mask':
                 temp_mask = torch.ones((70)).to(torch.bool).to(data.x.device)
-                data.train_mask = torch.cat([data.train_mask, temp_mask])
+                data.train_mask = torch.cat([data.train_mask, temp_mask]) 
+            elif key == 'valid_mask':
+                temp_mask = torch.ones((70)).to(torch.bool).to(data.x.device)
+                data.valid_mask = torch.cat([data.valid_mask, temp_mask])
+            elif key == 'test_mask':
+                temp_mask = torch.ones((70)).to(torch.bool).to(data.x.device)
+                data.test_mask = torch.cat([data.test_mask, temp_mask])
                     
         data.edge_index = edge_index
         data.edge_type = edge_type
@@ -84,7 +89,13 @@ class UnidirectionalVirtualClassNode(torch_geometric.transforms.BaseTransform):
                 data.y = torch.cat([data.y, temp_y], dim=0)
             elif key == 'train_mask':
                 temp_mask = torch.ones((70)).to(torch.bool).to(data.x.device)
-                data.train_mask = torch.cat([data.train_mask, temp_mask])
+                data.train_mask = torch.cat([data.train_mask, temp_mask]) 
+            elif key == 'valid_mask':
+                temp_mask = torch.ones((70)).to(torch.bool).to(data.x.device)
+                data.valid_mask = torch.cat([data.valid_mask, temp_mask])
+            elif key == 'test_mask':
+                temp_mask = torch.ones((70)).to(torch.bool).to(data.x.device)
+                data.test_mask = torch.cat([data.test_mask, temp_mask])
                     
         data.edge_index = edge_index
         data.edge_type = edge_type
