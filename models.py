@@ -14,6 +14,20 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
 
+class NoisyInput(nn.Module):
+
+    def __init__(self, noise_level:float=1e-2):
+        super().__init__()        
+        self.noise_level = noise_level
+
+    def forward(self, x:torch.Tensor) -> torch.Tensor:
+        if self.training:
+            noise = torch.randn_like(x, device = x.device) * self.noise_level
+            return x + noise
+        else:
+            return x
+
+
 class GNN(torch.nn.Module):
     def __init__(self):
         super().__init__()
@@ -32,7 +46,9 @@ class GNN(torch.nn.Module):
         raise NotImplementedError
 
 class GAT(GNN):
-    def __init__(self, in_channels, hidden_channels, number_of_classes, num_of_hidden_layers, device, heads=4):
+    def __init__(self, in_channels, hidden_channels, number_of_classes, 
+                 num_of_hidden_layers, device, heads=4,
+                 noise_level:float = 0.0):
         super().__init__()
         torch.manual_seed(42)
         self.name = 'Graph Attention Network'
@@ -44,9 +60,14 @@ class GAT(GNN):
         self.heads = heads
         self.model = self.build_model().to(device)
         self.num_of_parameters = self.get_n_params()
-        self.classifier_net = nn.Linear(in_features=hidden_channels, out_features=number_of_classes)
+        self.classifier_net = nn.Sequential(
+            nn.Linear(in_features=hidden_channels, out_features=number_of_classes)
+        ).to(device)
+        
+        self.noisy_input = NoisyInput(noise_level=noise_level)
 
     def forward(self, x, edge_index):
+        x = self.noisy_input(x)
         embedding = self.model(x, edge_index)
         return self.classifier_net(embedding), embedding
     
@@ -62,7 +83,9 @@ class GAT(GNN):
     
 
 class GraphSAGE(GNN):
-    def __init__(self, in_channels, hidden_channels, number_of_classes, num_of_hidden_layers, device, heads=8):
+    def __init__(self, in_channels, hidden_channels, 
+                 number_of_classes, num_of_hidden_layers, device, heads=8,
+                 noise_level:float = 0.0):
         super().__init__()
         torch.manual_seed(42)
         self.name = 'GraphSAGE'
@@ -72,11 +95,17 @@ class GraphSAGE(GNN):
         self.number_of_classes = number_of_classes
         self.device = device
         self.heads = heads
-        self.model = self.build_model()
+        self.model = self.build_model().to(device)
         self.num_of_parameters = self.get_n_params()
-        self.classifier_net = nn.Linear(in_features=self.hidden_channels, out_features=self.number_of_classes)
+        self.classifier_net = nn.Sequential(
+            nn.Linear(in_features=hidden_channels, out_features=number_of_classes)
+        ).to(device)
 
+        self.noisy_input = NoisyInput(noise_level=noise_level)
+
+        
     def forward(self, x, edge_index):
+        x = self.noisy_input(x)
         embedding = self.model(x, edge_index)
         return self.classifier_net(embedding), embedding
     
@@ -91,7 +120,9 @@ class GraphSAGE(GNN):
     
 
 class GIN(GNN):
-    def __init__(self, in_channels, hidden_channels, number_of_classes, num_of_hidden_layers, device, heads=8):
+    def __init__(self, in_channels, hidden_channels, number_of_classes, 
+                 num_of_hidden_layers, device, heads=8,
+                 noise_level:float = 0.0):
         super().__init__()
         torch.manual_seed(42)
         self.name = "GIN"
@@ -101,11 +132,16 @@ class GIN(GNN):
         self.number_of_classes = number_of_classes
         self.device = device
         self.heads = heads
-        self.model = self.build_model()
+        self.model = self.build_model().to(device)
         self.num_of_parameters = self.get_n_params()
-        self.classifier_net = nn.Linear(in_features=self.hidden_channels, out_features=self.number_of_classes)
+        self.classifier_net = nn.Sequential(
+            nn.Linear(in_features=hidden_channels, out_features=number_of_classes)
+        ).to(device)
+
+        self.noisy_input = NoisyInput(noise_level=noise_level)
 
     def forward(self, x, edge_index):
+        x = self.noisy_input(x)
         embedding = self.model(x, edge_index)
         return self.classifier_net(embedding), embedding
     
