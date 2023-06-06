@@ -1,3 +1,4 @@
+import torch
 from sklearn.metrics import f1_score
 from sklearn.metrics import classification_report
 import torch_geometric
@@ -24,7 +25,11 @@ def train_constrative_model(model, data:torch_geometric.data.data.Data, optimize
     
     if positive_sampling:
         CL = ConstrativeLosswithPositiveSample(temperature=temperature)
-        constrative_loss = constrative_coef * CL(embedding[-70:], embedding[CL.sample_class_node(70, data)])
+        idx_list = CL.class_embedding(70, data)
+        
+        class_embedding = torch.cat([embedding[idx].mean(axis=0) for idx in idx_list])
+
+        constrative_loss = constrative_coef * CL(embedding[-70:], class_embedding)
     else: 
         CL = ConstrativeLoss(temperature=temperature)
         constrative_loss = constrative_coef * CL(embedding[-70:])

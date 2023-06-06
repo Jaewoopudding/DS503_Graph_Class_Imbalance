@@ -45,6 +45,13 @@ class ConstrativeLosswithPositiveSample(nn.Module):
                 result = torch.tensor(idx)  
         return result
     
+    def class_embedding(self, num_of_class, data):
+        result=[]
+        for i in range(num_of_class):
+            sample_source = (data.y[data.train_mask] == i).nonzero()
+            result.append(sample_source)
+        return result
+    
 
 class Triplet_on_closest_emb(nn.Module):
     def __init__(self, ):
