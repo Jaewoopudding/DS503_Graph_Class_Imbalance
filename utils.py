@@ -35,7 +35,7 @@ def train_constrative_model_with_positive_sample(model, data:torch_geometric.dat
     model.train()
     optimizer.zero_grad()
     out, embedding = model(data.x, data.edge_index)
-    constrative_loss = constrative_coef * CL(embedding[-70:], out[CL.sample_class_node(70, data)])
+    constrative_loss = constrative_coef * CL(embedding[-70:], embedding[CL.sample_class_node(70, data)])
     loss = criterion(out[data.train_mask], data.y[data.train_mask]) + constrative_loss
     loss.backward()
     optimizer.step()
