@@ -14,6 +14,21 @@ class ConstrativeLoss(nn.Module):
         sim = (sim.sum(-1) / self.temperature).mean()
         return sim
     
+    
+class ConstrativeLosswithPositiveSample(nn.Module):
+    def __init__(self, temperature):
+        super().__init__()
+        self.temperature = temperature
+        
+        
+    def forward(self, cnode_embedding, samples_embedding):
+        sim_cnode = pairwise_cosine_similarity(cnode_embedding)
+        sim_cnode = (sim_cnode.sum(-1) / self.temperature).mean()
+        
+        sim_sample = torch.matmul(cnode_embedding, samples_embedding).diag().mean()
+        sim = sim_cnode - sim_sample
+        return sim
+    
 
 class Triplet_on_closest_emb(nn.Module):
     def __init__(self, ):
