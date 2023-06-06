@@ -22,13 +22,10 @@ def train_constrative_model(model, data:torch_geometric.data.data.Data, optimize
     model.train()
     optimizer.zero_grad()
     out, embedding = model(data.x, data.edge_index)
-    
     if positive_sampling:
         CL = ConstrativeLosswithPositiveSample(temperature=temperature)
         idx_list = CL.class_embedding(70, data)
-        
         class_embedding = torch.cat([embedding[idx].mean(axis=0) for idx in idx_list])
-
         constrative_loss = constrative_coef * CL(embedding[-70:], class_embedding)
     else: 
         CL = ConstrativeLoss(temperature=temperature)
@@ -50,14 +47,15 @@ def test_model(model, data:torch_geometric.data.data.Data):
 
 def valid_model(model, data:torch_geometric.data.data.Data, criterion, cnode_weight=1,
                 constrative_coef=2e-3, temperature=0.07, positive_sampling = False):
-
     model.eval()
     out, embedding = model(data.x, data.edge_index)
 
-    loss = criterion(out[data.valid_mask], data.y[data.valid_mask])
     if positive_sampling:
         CL = ConstrativeLosswithPositiveSample(temperature=temperature)
-        constrative_loss = constrative_coef * CL(embedding[-70:], embedding[CL.sample_class_node(70, data)])
+        idx_list = CL.class_embedding(70, data)
+        class_embedding = torch.cat([embedding[idx].mean(axis=0) for idx in idx_list])
+        constrative_loss = constrative_coef * CL(embedding[-70:], class_embedding)
+        
     else: 
         CL = ConstrativeLoss(temperature=temperature)
         constrative_loss = constrative_coef * CL(embedding[-70:])
