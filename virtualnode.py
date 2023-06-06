@@ -154,7 +154,7 @@ class VirtualClassNode_init(torch_geometric.transforms.BaseTransform):
                         temp_x = cand_x[choice].unsqueeze(0)
                         vnode_x.append(temp_x)
                     vnode_x = torch.cat(vnode_x, dim=0).to(data.x.device)
-                    data.x = torch.cat([data.x,vnode_x], dim=0)
+                data.x = torch.cat([data.x,vnode_x], dim=0)
             elif key == 'y':
                 temp_y = torch.arange(70).long().to(data.x.device)
                 data.y = torch.cat([data.y, temp_y], dim=0)
